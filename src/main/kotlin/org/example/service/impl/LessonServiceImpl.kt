@@ -2,6 +2,8 @@ package org.example.service.impl
 
 import org.example.dto.LessonDto
 import org.example.entity.LessonEntity
+import org.example.mapper.toDto
+import org.example.mapper.toEntity
 import org.example.repository.LessonRepository
 import org.example.service.LessonService
 import org.springframework.data.repository.findByIdOrNull
@@ -15,41 +17,24 @@ class LessonServiceImpl(private val lessonRepository: LessonRepository) : Lesson
 
     }
 
-    override fun create(lessonDto: LessonDto): Int? {
-        return lessonRepository.save(lessonDto.toEntity()).id
+    override fun create(lessonDto: LessonDto): LessonDto {
+        return lessonRepository.save(lessonDto.toEntity()).toDto()
     }
 
-    override fun update(id: Int, lessonDto: LessonDto) {
-        val existingLesson = lessonRepository.findByIdOrNull(id)
-            ?: throw RuntimeException("Lesson not found")
-
+    override fun update(id: Int, lessonDto: LessonDto): LessonDto {
+        val existingLesson = lessonRepository.findById(id)
+            .orElseThrow { RuntimeException("Lesson not found") }
         existingLesson.name = lessonDto.name
         existingLesson.color = lessonDto.color
         existingLesson.daysLeft = lessonDto.daysLeft
-
-        lessonRepository.save(existingLesson)
+        return lessonRepository.save(existingLesson).toDto()
     }
 
     override fun delete(id: Int) {
-        lessonRepository.findByIdOrNull(id)
-            ?: throw RuntimeException("Lesson not found")
-
+        lessonRepository.findById(id)
+            .orElseThrow { RuntimeException("Lesson not found") }
         lessonRepository.deleteById(id)
     }
 
-    private fun LessonEntity.toDto(): LessonDto =
-        LessonDto(
-            id = this.id,
-            name = this.name,
-            color = this.color,
-            daysLeft = this.daysLeft,
-        )
 
-    private fun LessonDto.toEntity(): LessonEntity =
-        LessonEntity(
-            id = 0,
-            name = this.name,
-            color = this.color,
-            daysLeft = this.daysLeft,
-        )
 }

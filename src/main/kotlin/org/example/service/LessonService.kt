@@ -6,9 +6,9 @@ interface LessonService {
 
     fun getAll(): List<LessonDto>
 
-    fun create(lessonDto: LessonDto): Int?
+    fun create(lessonDto: LessonDto): LessonDto
 
-    fun update(id: Int, lessonDto: LessonDto)
+    fun update(id: Int, lessonDto: LessonDto): LessonDto
 
     fun delete(id: Int)
 }
